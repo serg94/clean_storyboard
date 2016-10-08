@@ -24,12 +24,18 @@ function cleanStoryboard(dir) {
     });
 }
 
+function fetchConstrintsIds(xmlObject) {
+    if (!_.isObjectLike(xmlObject)) return; // array, object
+
+    _.forEach(xmlObject, cleanView);
+    _.forEach(xmlObject, fetchConstrintsIds);
+}
+
 function cleanView(view) {
-    var viewId = _.get(view, '$.id');
     var variation = view['variation'];
     var consArr = _.get(view, 'constraints[0].constraint');
 
-    if (!variation || !consArr) return;
+    if (!variation || !consArr) return; // not a view with variations
 
     var constraintIds = consArr.map(c => {
         return c['$']['id'];
@@ -90,7 +96,6 @@ function cleanView(view) {
     });
 
     var toExclude = _.difference(excludedIds, includedIds);
-    if (toExclude.length == 0) return;
 
     _.remove(consArr, c => {
         return toExclude.indexOf(c['$']['id']) != -1
@@ -101,13 +106,6 @@ function cleanView(view) {
     });
 
     count += toExclude.length;
-}
-
-function fetchConstrintsIds(xmlObject) {
-    if (!_.isObjectLike(xmlObject)) return; // array, object
-
-    _.forEach(xmlObject, cleanView);
-    _.forEach(xmlObject, fetchConstrintsIds);
 }
 
 module.exports = cleanStoryboard;
